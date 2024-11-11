@@ -14,7 +14,7 @@ int Pressure::Init(int pin) {
     ref_pressure = analogRead(_pin);
     for (int i = 1; i <= 200; i++) {
         ref_pressure = (analogRead(_pin)) * 0.25 + ref_pressure * 0.75;
-        delay(20);
+        delay(20); //to calculate an accurate value of ref pressure (static pressure inside the rocket)
     }
     return ref_pressure;
 }
@@ -23,7 +23,7 @@ float Pressure::GetAirSpeed() {
     int air_pressure = 0;
     for (int i = 0; i < 8; i++)
         air_pressure += analogRead(_pin);
-    air_pressure >>= 3;
+    air_pressure >>= 3; //shift for mean value /2^3
 
     if (air_pressure < ref_pressure)
         air_pressure = ref_pressure;
