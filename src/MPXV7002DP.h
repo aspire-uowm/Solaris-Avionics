@@ -1,37 +1,26 @@
-#ifndef SPEEDPRESSURE_H
-#define SPEEDPRESSURE_H
+#ifndef PRESSURE_SENSOR_H
+#define PRESSURE_SENSOR_H
 
 #include <Arduino.h>
 
-
-#define PRESSURE_SEA_LEVEL 101325.0    
-#define ABSOLUTE_0_KELVIN -273.15    
-#define DRY_AIR_MOLAR_MASS 0.0289644
-#define UNIVERSAL_GAS_CONSTANT 8.314
-
-class Pressure {
+class PressureSensor {
 public:
     // Constructor
-    Pressure();
+    PressureSensor(int analogPin, float density);
 
-    void begin(int baudrate);
+    // sensor init
+    void begin();
 
-    int Init(int pin);
+    // current kPa read
+    float readPressure();
 
-    float GetAirSpeed();
-
-    void loop();
+    float airspeed();
 
 private:
-    int _pin;               
-    int ref_pressure;       
-    float pitotpressure;    
-    float ambientpressure;  
-    float temperature;      
-    float density;         
-    float airspeed_ms;      
-    float airspeed_kmh;    
+    int _analogPin;       // esp32 pin that is connected to the vout of the sensor
+    float _referenceVoltage; // 3.3V or 5V
+    float _dividerRation;
+    float _density;
 };
 
-#endif // SPEEDPRESSURE_H
-
+#endif // PRESSURE_SENSOR_H

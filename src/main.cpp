@@ -8,6 +8,7 @@
 #define GPS_RX 3 
 #define PRESSURE_SENSOR_PIN 34
 #define INTERVAL 1000
+#define airDensity 1.204
 
 //GPSsens gps(GPS_RX, GPS_TX);
 
@@ -15,23 +16,20 @@ MPU6050Sensor mpu;
 
 uint32_t _interval = 0;
 
-Pressure pressureSensor;
-int airspeed = 0;
+PressureSensor pressureSensor(PRESSURE_SENSOR_PIN, airDensity);
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   mpu.setup();
   //gps.begin(); 
-  pressureSensor.begin(9600);
-  pressureSensor.Init(PRESSURE_SENSOR_PIN); 
+  pressureSensor.begin();
 }
 
 void loop() {
 
   if(millis() - _interval > INTERVAL ){
       mpu.loop();
-      pressureSensor.loop();
+      pressureSensor.airspeed();
       _interval = millis();
   }
 

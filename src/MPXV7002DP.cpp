@@ -1,49 +1,33 @@
 #include "MPXV7002DP.h"
+#include <iostream>
 
-Pressure::Pressure() {
+// Constructor: Initializes the analog pin and sets the reference voltage
+PressureSensor::PressureSensor(int analogPin, float density) : 
+                _analogPin(analogPin), _referenceVoltage(3.3), _dividerRation(0.735), _density(density) {} //
+
+// Initializes the sensor (if any additional setup is needed)
+void PressureSensor::begin() {
+    pinMode(_analogPin, INPUT);
+}
+
+// Reads the differential pressure in kPa
+float PressureSensor::readPressure() {
+    // Read the raw analog value
+    int analogValue = analogRead(_analogPin);
     
-}
+    // Convert raw value to voltage
+    float scaledVoltage = analogValue * (_referenceVoltage / 1023.0);
 
-void Pressure::begin(int baudRate) {
-    Serial.begin(baudRate);
-}
-
-int Pressure::Init(int pin) {
-    _pin = pin;
-    pinMode(_pin, INPUT);
-    ref_pressure = analogRead(_pin);
-    for (int i = 1; i <= 200; i++) {
-        ref_pressure = (analogRead(_pin)) * 0.25 + ref_pressure * 0.75;
-        delay(20); //to calculate an accurate value of ref pressure (static pressure inside the rocket)
-    }
-    return ref_pressure;
-}
-
-float Pressure::GetAirSpeed() {
-    int air_pressure = 0;
-    for (int i = 0; i < 8; i++)
-        air_pressure += analogRead(_pin);
-    air_pressure >>= 3; //shift for mean value /2^3
-
-    if (air_pressure < ref_pressure)
-        air_pressure = ref_pressure;
-
-    pitotpressure = 5000.0f * ((air_pressure - ref_pressure) / 1024.0f) + PRESSURE_SEA_LEVEL;
-    ambientpressure = PRESSURE_SEA_LEVEL;
-    temperature = 20.0f + ABSOLUTE_0_KELVIN;
-    density = (ambientpressure * DRY_AIR_MOLAR_MASS) / (temperature * UNIVERSAL_GAS_CONSTANT);
-    airspeed_ms = sqrt((2 * (pitotpressure - ambientpressure)) / density);
-    airspeed_kmh = airspeed_ms * 3.600;
-
-    return airspeed_kmh;
-}
-
-
-void Pressure::loop(){
+    float sensorVoltage = scaledVoltage / _dividerRation;
     
-  Serial.println("Airspeed is:");
-  Serial.println(GetAirSpeed());
-  Serial.println("km/h");
+    // Calculate pressure in kPa based on sensor transfer function
+    float pressure = (sensorVoltage - 2.5) ;  // From datasheet formula
+    
+    return pressure;
 }
 
-
+float PressureSensor::airspeed(){
+    float pressure = readPressure();
+    float airspeed = sqrt(2 * pressure/_density);
+    return airspeed;
+}
