@@ -1,27 +1,27 @@
 #include "MPXV7002DP.h"
 #include <iostream>
 
-// Constructor: Initializes the analog pin and sets the reference voltage
+// Constructor: analog pin init and ref voltage based on the esp32 handle
 PressureSensor::PressureSensor(int analogPin, float density) : 
                 _analogPin(analogPin), _referenceVoltage(3.3), _dividerRation(0.735), _density(density) {} //
 
-// Initializes the sensor (if any additional setup is needed)
+// Sensor init
 void PressureSensor::begin() {
     pinMode(_analogPin, INPUT);
 }
 
-// Reads the differential pressure in kPa
+// diff pressure read
 float PressureSensor::readPressure() {
-    // Read the raw analog value
+    // Read the analog value
     int analogValue = analogRead(_analogPin);
     
-    // Convert raw value to voltage
+    // Convert analogRead to voltage based on the 3.3V ref
     float scaledVoltage = analogValue * (_referenceVoltage / 1023.0);
 
     float sensorVoltage = scaledVoltage / _dividerRation;
     
-    // Calculate pressure in kPa based on sensor transfer function
-    float pressure = (sensorVoltage - 2.5) ;  // From datasheet formula
+    // Calculate diff pressure
+    float pressure = (sensorVoltage - 2.5) ;  // datasheet formula
     
     return pressure;
 }
