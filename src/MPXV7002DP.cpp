@@ -1,9 +1,12 @@
 #include "MPXV7002DP.h"
-#include <iostream>
+//#include <iostream>
 
 // Constructor: analog pin init and ref voltage based on the esp32 handle
 PressureSensor::PressureSensor(int analogPin, float density) : 
-                _analogPin(analogPin), _referenceVoltage(3.3), _dividerRation(0.735), _density(density) {} //
+                _analogPin(analogPin), _referenceVoltage(3.3), _dividerRation(0.735), _density(density) {
+
+
+                } //
 
 // Sensor init
 void PressureSensor::begin() {
@@ -25,6 +28,8 @@ float PressureSensor::readPressure() {
     
     return pressure;
 }
+
+
 
 float PressureSensor::airspeed(){
     float pressure = readPressure();

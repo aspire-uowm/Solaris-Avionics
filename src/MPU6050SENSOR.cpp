@@ -10,17 +10,17 @@ void MPU6050Sensor::setup(){
     // Initialize I2C connection
     Wire.begin();
 
-    // Initialize the MPU6050 sensor
-    _mpu.initialize();
-    _mpu.getMotion6(&_ax, &_ay, &_az, &_gx, &_gy, &_gz);
-
-    calculateIMUErrors();
-
     // Check if the sensor connection is successful
     if (!_mpu.testConnection()) {
         Serial.println("MPU6050 connection failed");
         while (1); // Enter an infinite loop to prevent code execution
     }
+
+    // Initialize the MPU6050 sensor
+    _mpu.initialize();
+    _mpu.getMotion6(&_ax, &_ay, &_az, &_gx, &_gy, &_gz);
+
+    calculateIMUErrors();
 }
 
 void MPU6050Sensor::loop(){
