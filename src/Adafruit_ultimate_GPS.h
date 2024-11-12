@@ -7,6 +7,7 @@ public:
 
     void begin() {
         //GPS hardware serial begin
+        Serial.begin(115200); 
         gpsSerial.begin(baudRate, SERIAL_8N1, rxPin, txPin);
         GPS.begin(baudRate);
         
