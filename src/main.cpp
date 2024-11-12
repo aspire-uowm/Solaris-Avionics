@@ -11,7 +11,7 @@
 #define INTERVAL 1000 // 1 sec
 #define airDensity 1.204
 
-//GPSsens gps(GPS_RX, GPS_TX);
+GPSsens gps(GPS_RX, GPS_TX);
 
 //MPU6050Sensor mpu;
 
@@ -25,7 +25,7 @@ void setup() {
     Serial.begin(9600);
 	//bmp.setup();
     //mpu.setup();
-    //gps.begin(); 
+    gps.begin(); 
     pressureSensor.begin();
 
 }
@@ -40,9 +40,9 @@ void loop() {
       	_interval = millis();
   }
 
- /* 
+ 
   if (gps.readData()) {
     gps.printData();
   }
-  */
+  
 }
