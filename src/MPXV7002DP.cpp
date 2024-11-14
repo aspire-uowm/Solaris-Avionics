@@ -19,20 +19,23 @@ float PressureSensor::readPressure() {
     int analogValue = analogRead(_analogPin);
     
     // Convert analogRead to voltage based on the 3.3V ref
-    float scaledVoltage = analogValue * (_referenceVoltage / 1023.0);
+    float scaledVoltage = analogValue * (_referenceVoltage / 4096.0);
 
     float sensorVoltage = scaledVoltage / _dividerRation;
     
     // Calculate diff pressure
-    float pressure = (sensorVoltage - 2.5) ;  // datasheet formula
-    
-    return pressure;
+    float diff_pressure = (sensorVoltage - 2.5) ;  // datasheet formula
+    if(diff_pressure < 0){
+        diff_pressure = -diff_pressure; //flag is needed for minus sign
+    }
+
+    return diff_pressure;
 }
 
 
 
 float PressureSensor::airspeed(){
-    float pressure = readPressure();
-    float airspeed = sqrt(2 * pressure/_density);
+    float diff_pressure = readPressure();
+    float airspeed = sqrt(2 * diff_pressure/_density); //density read
     return airspeed;
 }

@@ -25,7 +25,7 @@ void setup() {
     Serial.begin(9600);
 	//bmp.setup();
     //mpu.setup();
-    gps.begin(); 
+    //gps.begin(); 
     pressureSensor.begin();
 
 }
@@ -36,13 +36,14 @@ void loop() {
       	// mpu.loop();
 		Serial.print("Speed = ");
       	Serial.println(pressureSensor.airspeed());
+        Serial.print("m/s");
 
       	_interval = millis();
   }
 
  
-  if (gps.readData()) {
-    gps.printData();
-  }
+  //if (gps.readData()) {
+    //gps.printData();
+  //}
   
 }
