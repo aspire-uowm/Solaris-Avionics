@@ -15,19 +15,19 @@ GPSsens gps(GPS_RX, GPS_TX);
 
 //MPU6050Sensor mpu;
 
-BMPSensor bmp;
+//BMPSensor bmp;
 
 uint32_t _interval = 0;
 
-PressureSensor pressureSensor(PRESSURE_SENSOR_PIN, airDensity);
+//PressureSensor pressureSensor(PRESSURE_SENSOR_PIN, airDensity);
 
 void setup() {
     Serial.begin(9600);
-	  bmp.setup();
+	  //bmp.setup();
     //mpu.setup();
     gps.begin(); 
     gps.setUpdateRate(1); // Set update rate to 1 Hz
-    pressureSensor.begin();
+    //pressureSensor.begin();
 
 }
 
@@ -35,9 +35,9 @@ void loop() {
 
   	if(millis() - _interval > INTERVAL ){
       	// mpu.loop();
-		Serial.print("Speed = ");
-      	Serial.println(pressureSensor.airspeed());
-        Serial.print("m/s");
+		//Serial.print("Speed = ");
+      	//Serial.println(pressureSensor.airspeed());
+        //Serial.print("m/s");
 
       	_interval = millis();
   }
