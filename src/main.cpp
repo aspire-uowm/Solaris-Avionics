@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "Adafruit_ultimate_GPS.h"
+#include "GPSsens.h"
 #include "MPXV7002DP.h"
 #include "MPU6050SENSOR.h"
 #include "BMPSensor.h"
@@ -23,9 +23,10 @@ PressureSensor pressureSensor(PRESSURE_SENSOR_PIN, airDensity);
 
 void setup() {
     Serial.begin(9600);
-	//bmp.setup();
+	  bmp.setup();
     //mpu.setup();
-    //gps.begin(); 
+    gps.begin(); 
+    gps.setUpdateRate(1); // Set update rate to 1 Hz
     pressureSensor.begin();
 
 }
@@ -42,8 +43,8 @@ void loop() {
   }
 
  
-  //if (gps.readData()) {
-    //gps.printData();
-  //}
+    if (gps.readData()) {
+      gps.printData();
+    }
   
 }
