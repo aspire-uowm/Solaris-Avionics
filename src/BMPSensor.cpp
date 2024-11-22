@@ -1,7 +1,7 @@
 #include "BMPSensor.h"
 #include <cmath>
 
-#define SEALEVELPRESSURE_PA (101325.0)
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 BMPSensor::BMPSensor() : _initialized(false){
     // Write code here.
@@ -37,18 +37,18 @@ void BMPSensor::loop(){
         return;
     }
 
-    _temperature = _bmp.temperature - _temp_error;
-    Serial.print("Temperature = ");
+    _temperature = _bmp.temperature;
+    Serial.print("[BMP388]Temperature = ");
     Serial.print(_temperature);
     Serial.println(" *C");
 
-    _pressure = _bmp.pressure - _pressure_error;
-    Serial.print("Pressure = ");
+    _pressure = _bmp.pressure;
+    Serial.print("[BMP388]Pressure = ");
     Serial.print(_pressure);
     Serial.println(" Pa");
 
-    _altitude = _bmp.readAltitude(SEALEVELPRESSURE_PA) - _altitude_error;
-    Serial.print("Approx. Altitude = ");
+    _altitude = _bmp.readAltitude(SEALEVELPRESSURE_HPA);
+    Serial.print("[BMP388]Approx. Altitude = ");
     Serial.print(_altitude);
     Serial.println(" m");
 }
@@ -69,13 +69,13 @@ float BMPSensor::getAltitute(){
 }
 
 void BMPSensor::calculateBMPErrors(){
-    int samplecount = 1000;
+    int samplecount = 200;
     for(int i = 0; i<samplecount; i++){
         _bmp.performReading();
 
         _temp_error += _bmp.temperature;
         _pressure_error += _bmp.pressure;
-        _altitude_error += _bmp.readAltitude(SEALEVELPRESSURE_PA);
+        _altitude_error += _bmp.readAltitude(SEALEVELPRESSURE_HPA);
     }
 
     _bmp.performReading();
@@ -84,22 +84,22 @@ void BMPSensor::calculateBMPErrors(){
     // calculatin the RMSE of the sensors
     float temp_ref = _bmp.temperature;
     float pressure_ref = _bmp.pressure;
-    float altitude_ref = _bmp.readAltitude(SEALEVELPRESSURE_PA);
+    float altitude_ref = _bmp.readAltitude(SEALEVELPRESSURE_HPA);
 
     temp_ref = temp_ref * samplecount;
     pressure_ref = pressure_ref * samplecount;
     altitude_ref = altitude_ref * samplecount;
     
     _temp_error =  sqrt(pow(_temp_error - temp_ref, 2)/samplecount);
-    Serial.print("Temperature Error = ");
-    Serial.print(_temp_error);
-    Serial.println(" *C");
+    // Serial.print("Temperature Error = ");
+    // Serial.print(_temp_error);
+    // Serial.println(" *C");
     _pressure_error = sqrt(pow(_pressure_error - pressure_ref, 2)/samplecount);
-    Serial.print("Pressure Error = ");
-    Serial.print(_pressure_error);
-    Serial.println(" Pa");
+    // Serial.print("Pressure Error = ");
+    // Serial.print(_pressure_error);
+    // Serial.println(" Pa");
     _altitude_error = sqrt(pow(_altitude_error - altitude_ref, 2)/samplecount);
-    Serial.print("Altitude Error = ");
-    Serial.print(_altitude_error);
-    Serial.println(" m");
+    // Serial.print("Altitude Error = ");
+    // Serial.print(_altitude_error);
+    // Serial.println(" m");
 }
