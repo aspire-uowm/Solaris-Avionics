@@ -12,7 +12,7 @@ void GPSsens::begin() {
 
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set output to GPRMC and GPGGA sentences
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);   // Set update rate to 10 Hz
-    Serial.println("GPS initialized.");
+    Serial.println("GPS initialized. Attempting to connect to satellites...");
 }
 
 // Read data from the GPS module
@@ -52,10 +52,17 @@ float GPSsens::getSpeed() const {
 
 // Print GPS data
 void GPSsens::printData() {
+    static unsigned long lastPrint = 0;
+    unsigned long currentTime = millis();
+
     if (!GPS.fix) {
-        Serial.println("GPS: Waiting for GPS fix...");
+        if (currentTime - lastPrint >= 2000) { // Print every 2 seconds while connecting
+            Serial.println("GPS: Attempting to acquire satellite fix...");
+            lastPrint = currentTime;
+        }
         return;
     }
+
     Serial.print("GPS: Latitude: "); Serial.println(getLat(), 4);
     Serial.print("GPS: Longitude: "); Serial.println(getLong(), 4);
     Serial.print("GPS: Altitude: "); Serial.println(getAlt());
@@ -75,4 +82,9 @@ void GPSsens::setUpdateRate(int hz) {
         Serial.println("GPS: Unsupported update rate. Defaulting to 1 Hz.");
         GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
     }
+}
+
+// Check if GPS is attempting to connect to satellites
+bool GPSsens::isConnecting() const {
+    return !GPS.fix;
 }

@@ -43,8 +43,11 @@ void loop() {
   }
 
  
-    if (gps.readData()) {
-      gps.printData();
-    }
+    if (gps.isConnecting()) { // Check if GPS is still connecting
+        gps.printData();      // Print connection status
+    }else {
+    if (gps.readData()) { // Once connected, print actual data
+            gps.printData();
+        }
   
 }

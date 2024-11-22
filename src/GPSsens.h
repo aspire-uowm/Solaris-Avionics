@@ -13,6 +13,7 @@ private:
     long baudRate;
 
 public:
+public:
     GPSsens(int rxPin, int txPin, long baudRate = 9600);
     void begin();
     bool readData();
@@ -22,6 +23,7 @@ public:
     float getSpeed() const;
     void printData();
     void setUpdateRate(int hz);
+    bool isConnecting() const; // Check if GPS is connecting to satellites
 
 
 };
