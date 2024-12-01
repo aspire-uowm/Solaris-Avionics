@@ -3,7 +3,7 @@
 
 // Constructor: analog pin init and ref voltage based on the esp32 handle
 PressureSensor::PressureSensor(int analogPin, float density) : 
-                _analogPin(analogPin), _referenceVoltage(3.3), _dividerRation(0.735), _density(density) {
+                _analogPin(analogPin), _referenceVoltage(3.3), _dividerRatio(0.735), _density(density) {
 
 
                 } //
@@ -21,7 +21,7 @@ float PressureSensor::readPressure() {
     // Convert analogRead to voltage based on the 3.3V ref
     float scaledVoltage = analogValue * (_referenceVoltage / 4096.0);
 
-    float sensorVoltage = scaledVoltage / _dividerRation;
+    float sensorVoltage = scaledVoltage / _dividerRatio;
     
     // Calculate diff pressure
     float diff_pressure = (sensorVoltage - 2.5) ;  // datasheet formula

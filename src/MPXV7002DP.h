@@ -19,7 +19,7 @@ public:
 private:
     int _analogPin;       // esp32 pin that is connected to the vout of the sensor
     float _referenceVoltage; // 3.3V or 5V
-    float _dividerRation;
+    float _dividerRatio;
     float _density;
 };
 

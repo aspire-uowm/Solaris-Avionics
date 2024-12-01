@@ -60,5 +60,6 @@
     "*.m": "matlab",
     "*.asm": "assembly",
     "cmath": "cpp"
-  }
+  },
+  "r.lsp.promptToInstall": false
 }
