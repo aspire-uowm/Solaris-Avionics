@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include "GPSsens.h"
-#include "MPXV7002DP.h"
-#include "MPU6050SENSOR.h"
-#include "BMPSensor.h"
+#include "GPS\GPSsens.h"
+#include "PITOT\MPXV7002DP.h"
+#include "MPU\MPU6050SENSOR.h"
+#include "BMP\BMPSensor.h"
 
 
 #define GPS_TX 1
