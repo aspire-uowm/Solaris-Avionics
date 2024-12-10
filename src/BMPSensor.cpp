@@ -1,3 +1,10 @@
+/*  
+File: BMPSensor.cpp
+Author: Theodoros Taloumtzis
+Date: 10/12/2024
+Purpose: Implements the BMPSensor class functions.
+*/ 
+
 #include "BMPSensor.h"
 #include <cmath>
 
@@ -14,9 +21,10 @@ BMPSensor::BMPSensor(){
 }
 
 void BMPSensor::setup(){
-
+    // Initialize serial communication
     Serial.begin(9600);
 
+    // Initialize I2C communication
     Wire.begin();
 
     if (!_bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
@@ -34,12 +42,12 @@ void BMPSensor::setup(){
 }
 
 void BMPSensor::loop(){
-    if (! _bmp.performReading()) {
+    if (! _bmp.performReading()) { // if reading fails
         Serial.println("Failed to perform reading :(");
         return;
     }
 
-    _temperature = _bmp.temperature;
+    _temperature = _bmp.temperature; 
     Serial.print("[BMP388]Temperature = ");
     Serial.print(_temperature);
     Serial.println(" *C");
@@ -73,14 +81,20 @@ float BMPSensor::getAltitute(){
 void BMPSensor::calculateBMPErrors(){
     int samplecount = 200;
     for(int i = 0; i<samplecount; i++){
-        _bmp.performReading();
+        if(! _bmp.performReading()) { // if reading fails
+            Serial.println("Failed to perform reading :(");
+            return;
+        }
 
         _temp_error += _bmp.temperature;
         _pressure_error += _bmp.pressure;
         _altitude_error += _bmp.readAltitude(SEALEVELPRESSURE_HPA);
     }
 
-    _bmp.performReading();
+    if (! _bmp.performReading()) { // if reading fails
+        Serial.println("Failed to perform reading :(");
+        return;
+    }
 
 
     // calculatin the RMSE of the sensors

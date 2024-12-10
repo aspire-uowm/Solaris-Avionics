@@ -1,3 +1,10 @@
+/*  
+File: MPU6050SENSOR.h
+Author: Theodoros Taloumtzis
+Date: 10/12/2024
+Purpose: Implements the MPU6050Sensor class and its API class declarations.
+*/
+
 #ifndef MPU6050SENSOR_H
 #define MPU6050SENSOR_H
 

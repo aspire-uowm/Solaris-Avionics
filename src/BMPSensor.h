@@ -1,3 +1,10 @@
+/*  
+File: BMPSensor.h
+Author: Theodoros Taloumtzis
+Date: 10/12/2024
+Purpose: Implements the BMPSensor class declarations.
+*/
+
 #ifndef BMP_SENSOR_H
 #define BMP_SENSOR_H
 

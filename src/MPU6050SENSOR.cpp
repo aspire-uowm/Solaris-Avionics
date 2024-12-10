@@ -1,3 +1,10 @@
+/*  
+File: MPU6050SENSOR.cpp
+Author: Theodoros Taloumtzis
+Date: 10/12/2024
+Purpose: Implements the MPU6050Sensor class functions.
+*/
+
 #include "MPU6050SENSOR.h"
 #include <math.h>
 
