@@ -113,6 +113,7 @@ float MPU6050Sensor::getAngleZ() {
 }
 
 void MPU6050Sensor::calculateIMUErrors() {
+    
     int sample_count = 256; // Number of samples to average
     for (int i = 0; i < sample_count; i++) {
         // Read raw accelerometer and gyroscope data

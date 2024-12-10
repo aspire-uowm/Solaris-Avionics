@@ -40,7 +40,7 @@ void loop() {
         //Serial.print("m/s");
 
       	_interval = millis();
-  }
+  	}
 
  
     if (gps.isConnecting()) { // Check if GPS is still connecting

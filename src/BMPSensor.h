@@ -24,6 +24,8 @@ private:
     float _pressure_error;
     float _altitude_error;
 
+    const float SEALEVELPRESSURE_HPA = 1013.25;
+
 public:
     // Methods
     BMPSensor();

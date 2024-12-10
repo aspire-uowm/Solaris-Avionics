@@ -8,7 +8,6 @@ Purpose: Implements the BMPSensor class functions.
 #include "BMPSensor.h"
 #include <cmath>
 
-#define SEALEVELPRESSURE_HPA (1013.25)
 
 BMPSensor::BMPSensor(){
     _temp_error = 0.0;
@@ -17,7 +16,7 @@ BMPSensor::BMPSensor(){
     _temperature = 0.0;
     _pressure = 0.0;
     _altitude = 0.0;
-    _initialized = false;
+    _initialized = false;   
 }
 
 void BMPSensor::setup(){
