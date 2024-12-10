@@ -15,6 +15,8 @@ BMPSensor::BMPSensor(){
 
 void BMPSensor::setup(){
 
+    Serial.begin(9600);
+
     Wire.begin();
 
     if (!_bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
