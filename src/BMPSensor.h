@@ -20,6 +20,7 @@ private:
 public:
     // Methods
     BMPSensor();
+    ~BMPSensor();
     void setup();
     void loop();
     void calculateBMPErrors();

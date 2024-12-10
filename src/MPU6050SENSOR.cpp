@@ -1,12 +1,37 @@
 #include "MPU6050SENSOR.h"
 #include <math.h>
 
+// Constructor
+MPU6050Sensor::MPU6050Sensor() {
+    _ax = 0;
+    _ay = 0;
+    _az = 0;
+    _gx = 0;
+    _gy = 0;
+    _gz = 0;
 
-MPU6050Sensor::MPU6050Sensor(){
+    _acc_x = 0;
+    _acc_y = 0;
+    _acc_z = 0;
 
+    _angle_x = 0;
+    _angle_y = 0;
+    _angle_z = 0;
+
+    _acc_error_x = 0;
+    _acc_error_y = 0;
+
+    _gyro_error_x = 0;
+    _gyro_error_y = 0;
+    _gyro_error_z = 0;
+
+    _previous_time = 0;
 }
 
-void MPU6050Sensor::setup(){
+// Destructor
+MPU6050Sensor::~MPU6050Sensor() { }
+
+void MPU6050Sensor::setup() {
     // Initialize I2C connection
     Wire.begin();
 
@@ -23,108 +48,99 @@ void MPU6050Sensor::setup(){
     calculateIMUErrors();
 }
 
-void MPU6050Sensor::loop(){
+void MPU6050Sensor::loop() {
     // Read the raw accelerometer and gyroscope data
     _mpu.getMotion6(&_ax, &_ay, &_az, &_gx, &_gy, &_gz);
 
     // Convert raw accelerometer readings to g-force values
-    _AccX = _ax / 16384.0;
-    _AccY = _ay / 16384.0;
-    _AccZ = _az / 16384.0;
+    _acc_x = _ax / 16384.0;
+    _acc_y = _ay / 16384.0;
+    _acc_z = _az / 16384.0;
 
     // Calculate the angles using accelerometer data
-    _AngleX = atan2(_AccY, _AccZ) * 180 / PI;  // Roll angle in degrees
-    _AngleY = atan2(-_AccX, sqrt(_AccY * _AccY + _AccZ * _AccZ)) * 180 / PI;  // Pitch angle in degrees
+    _angle_x = atan2(_acc_y, _acc_z) * 180 / PI;  // Roll angle in degrees
+    _angle_y = atan2(-_acc_x, sqrt(_acc_y * _acc_y + _acc_z * _acc_z)) * 180 / PI;  // Pitch angle in degrees
 
     // Calculate the approximate yaw angle using gyro data and time delta
-    unsigned long currentTime = millis();
-    float elapsedTime = (currentTime - _previousTime) / 1000.0; // Convert to seconds
-    _previousTime = currentTime;
+    unsigned long current_time = millis();
+    float elapsed_time = (current_time - _previous_time) / 1000.0; // Convert to seconds
+    _previous_time = current_time;
 
-    float GyroZ = _gz / 131.0; // Convert gyro Z to degrees/second
-    _AngleZ += GyroZ * elapsedTime; // Integrate for yaw angle (AngleZ)
+    float gyro_z = _gz / 131.0; // Convert gyro Z to degrees/second
+    _angle_z += gyro_z * elapsed_time; // Integrate for yaw angle (_angle_z)
 
-
-    // Print the error values to the Serial Monitor for reference
+    // Print the sensor values
     Serial.print("AccX: ");
-    Serial.println(_AccX);
+    Serial.println(_acc_x);
     Serial.print("AccY: ");
-    Serial.println(_AccY);
+    Serial.println(_acc_y);
     Serial.print("AccZ: ");
-    Serial.println(_AccZ);
+    Serial.println(_acc_z);
     Serial.print("AngleX: ");
-    Serial.println(_AngleX);
+    Serial.println(_angle_x);
     Serial.print("AngleY: ");
-    Serial.println(_AngleY);
+    Serial.println(_angle_y);
     Serial.print("AngleZ: ");
-    Serial.println(_AngleZ);
+    Serial.println(_angle_z);
 }
 
 // Getters
-float MPU6050Sensor::getAccX(){
-    /* rerutns the g-force value for the X-Axis*/
-    return _AccX;
+float MPU6050Sensor::getAccX() {
+    return _acc_x;
 }
-float MPU6050Sensor::getAccY(){
-    /* rerutns the g-force value for the Y-Axis*/
-    return _AccY;
+float MPU6050Sensor::getAccY() {
+    return _acc_y;
 }
-float MPU6050Sensor::getAccZ(){
-    /* rerutns the g-force value for the Z-Axis*/
-    return _AccZ;
+float MPU6050Sensor::getAccZ() {
+    return _acc_z;
 }
 
-float MPU6050Sensor::getAngleX(){
-    /* rerutns the angle value for the X-Axis*/
-    return _AngleX;
+float MPU6050Sensor::getAngleX() {
+    return _angle_x;
 }
-float MPU6050Sensor::getAngleY(){
-    /* rerutns the angle value for the Y-Axis*/
-    return _AngleY;
+float MPU6050Sensor::getAngleY() {
+    return _angle_y;
 }
-float MPU6050Sensor::getAngleZ(){
-    /* rerutns the angle value for the Z-Axis*/
-    return _AngleZ;
+float MPU6050Sensor::getAngleZ() {
+    return _angle_z;
 }
-
-
 
 void MPU6050Sensor::calculateIMUErrors() {
-    int sampleCount = 256; // Number of samples to average
-    for (int i = 0; i < sampleCount; i++) {
+    int sample_count = 256; // Number of samples to average
+    for (int i = 0; i < sample_count; i++) {
         // Read raw accelerometer and gyroscope data
         _mpu.getMotion6(&_ax, &_ay, &_az, &_gx, &_gy, &_gz);
 
         // Calculate accelerometer angles and sum them for averaging
-        _AccX = _ax / 16384.0;
-        _AccY = _ay / 16384.0;
-        _AccZ = _az / 16384.0;
+        _acc_x = _ax / 16384.0;
+        _acc_y = _ay / 16384.0;
+        _acc_z = _az / 16384.0;
 
-        _AccErrorX += atan2(_AccY, sqrt(_AccX * _AccX + _AccZ * _AccZ)) * 180 / PI;
-        _AccErrorY += atan2(-_AccX, sqrt(_AccY * _AccY + _AccZ * _AccZ)) * 180 / PI;
+        _acc_error_x += atan2(_acc_y, sqrt(_acc_x * _acc_x + _acc_z * _acc_z)) * 180 / PI;
+        _acc_error_y += atan2(-_acc_x, sqrt(_acc_y * _acc_y + _acc_z * _acc_z)) * 180 / PI;
 
         // Sum gyroscope readings for averaging
-        _GyroErrorX += _gx / 131.0;
-        _GyroErrorY += _gy / 131.0;
-        _GyroErrorZ += _gz / 131.0;
+        _gyro_error_x += _gx / 131.0;
+        _gyro_error_y += _gy / 131.0;
+        _gyro_error_z += _gz / 131.0;
     }
 
     // Average the error values
-    _AccErrorX /= sampleCount;
-    _AccErrorY /= sampleCount;
-    _GyroErrorX /= sampleCount;
-    _GyroErrorY /= sampleCount;
-    _GyroErrorZ /= sampleCount;
+    _acc_error_x /= sample_count;
+    _acc_error_y /= sample_count;
+    _gyro_error_x /= sample_count;
+    _gyro_error_y /= sample_count;
+    _gyro_error_z /= sample_count;
 
     // Print the error values to the Serial Monitor for reference
     Serial.print("AccErrorX: ");
-    Serial.println(_AccErrorX);
+    Serial.println(_acc_error_x);
     Serial.print("AccErrorY: ");
-    Serial.println(_AccErrorY);
+    Serial.println(_acc_error_y);
     Serial.print("GyroErrorX: ");
-    Serial.println(_GyroErrorX);
+    Serial.println(_gyro_error_x);
     Serial.print("GyroErrorY: ");
-    Serial.println(_GyroErrorY);
+    Serial.println(_gyro_error_y);
     Serial.print("GyroErrorZ: ");
-    Serial.println(_GyroErrorZ);
+    Serial.println(_gyro_error_z);
 }

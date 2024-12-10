@@ -11,17 +11,18 @@ class MPU6050Sensor {
     int16_t _ax, _ay, _az, _gx, _gy, _gz;
 
     // Variables to store the sensor values 
-    float _AccX, _AccY, _AccZ;
-    float _AngleX, _AngleY, _AngleZ;
-    unsigned long _previousTime = 0;
+    float _acc_x, _acc_y, _acc_z;
+    float _angle_x, _angle_y, _angle_z;
+    unsigned long _previous_time;
 
 
     // Variables to store sensor error values
-    float _AccErrorX = 0, _AccErrorY = 0;
-    float _GyroErrorX = 0, _GyroErrorY = 0, _GyroErrorZ = 0;
+    float _acc_error_x, _acc_error_y;
+    float _gyro_error_x, _gyro_error_y, _gyro_error_z;
 
   public:
     MPU6050Sensor();
+	~MPU6050Sensor();
     void setup();
 
     // Runs in the loop function and updates the sensor data.

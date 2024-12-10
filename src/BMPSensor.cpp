@@ -3,22 +3,22 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-BMPSensor::BMPSensor() : _initialized(false){
-    // Write code here.
+BMPSensor::BMPSensor(){
+    _temp_error = 0.0;
+    _pressure_error = 0.0;
+    _altitude_error = 0.0;
+    _temperature = 0.0;
+    _pressure = 0.0;
+    _altitude = 0.0;
+    _initialized = false;
 }
 
 void BMPSensor::setup(){
 
-    Serial.begin(9600);
-
     Wire.begin();
 
-    _temp_error = 0.0;
-    _pressure_error = 0.0;
-    _altitude_error = 0.0;
-
     if (!_bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
-        Serial.println("Could not find a valid BMP3 sensor, check wiring!");
+        Serial.println("Could not find a valid BMP388 sensor, check wiring!");
         while (1);
     }
 
