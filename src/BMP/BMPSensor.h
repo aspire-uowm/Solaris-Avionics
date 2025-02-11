@@ -13,6 +13,7 @@ Purpose: Implements the BMPSensor class declarations.
 
 class BMPSensor{
 private:
+    TwoWire* _wire;
     float _temperature;
     float _pressure;
     float _altitude;
@@ -28,7 +29,7 @@ private:
 
 public:
     // Methods
-    BMPSensor();
+    BMPSensor(TwoWire* wire);
     ~BMPSensor();
     void setup();
     void loop();

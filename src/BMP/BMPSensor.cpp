@@ -9,7 +9,7 @@ Purpose: Implements the BMPSensor class functions.
 #include <cmath>
 
 
-BMPSensor::BMPSensor(){
+BMPSensor::BMPSensor(TwoWire* wire) : _wire(wire) {
     _temp_error = 0.0;
     _pressure_error = 0.0;
     _altitude_error = 0.0;
@@ -19,14 +19,17 @@ BMPSensor::BMPSensor(){
     _initialized = false;   
 }
 
+// Destructor 
+BMPSensor::~BMPSensor() { }
+
 void BMPSensor::setup(){
     // Initialize serial communication
     Serial.begin(9600);
 
     // Initialize I2C communication
-    Wire.begin();
+    _wire->begin();
 
-    if (!_bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
+    if (!_bmp.begin_I2C(BMP3XX_DEFAULT_ADDRESS, _wire)) {   // hardware I2C mode, can pass in address & alt Wire
         Serial.println("Could not find a valid BMP388 sensor, check wiring!");
         while (1);
     }

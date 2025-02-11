@@ -1,7 +1,8 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include "GPS\GPSsens.h"
 #include "PITOT\MPXV7002DP.h"
-#include "MPU\MPU6050SENSOR.h"
+#include "ICM20948/ICM20948SENSOR.h"
 #include "BMP\BMPSensor.h"
 
 
@@ -11,44 +12,45 @@
 #define INTERVAL 1000 // 1 sec
 #define airDensity 1.204
 
-GPSsens gps(GPS_RX, GPS_TX);
 
-//MPU6050Sensor mpu;
 
-//BMPSensor bmp;
+//GPSsens gps(GPS_RX, GPS_TX);
+
+ICM20948Sensor _icm1(&Wire);
+ICM20948Sensor _icm2(&Wire1);
+
+BMPSensor _bmp1(&Wire);
+BMPSensor _bmp2(&Wire1);
 
 uint32_t _interval = 0;
 
 //PressureSensor pressureSensor(PRESSURE_SENSOR_PIN, airDensity);
 
 void setup() {
-    Serial.begin(9600);
-	  //bmp.setup();
-    //mpu.setup();
-    gps.begin(); 
-    gps.setUpdateRate(1); // Set update rate to 1 Hz
-    //pressureSensor.begin();
+
+  	Serial.begin(9600);
+    Wire.begin();  // Initialize the i2c bus 1 with pins 18 & 19
+    Wire1.begin(); // Initialize the i2c bus 2 with pins 17 & 16
+
+    _bmp1.setup();
+	_bmp2.setup();
+
+	_icm1.setup();
+	_icm2.setup();
+
+
 
 }
 
 void loop() {
 
   	if(millis() - _interval > INTERVAL ){
-      	// mpu.loop();
-		//Serial.print("Speed = ");
-      	//Serial.println(pressureSensor.airspeed());
-        //Serial.print("m/s");
+      	_icm1.loop();
+	  	_icm2.loop();
 
+	  	_bmp1.loop();
+	  	_bmp2.loop();
       	_interval = millis();
   	}
 
- 
-    if (gps.isConnecting()) { // Check if GPS is still connecting
-        gps.printData();      // Print connection status
-    }else {
-    if (gps.readData()) { // Once connected, print actual data
-            gps.printData();
-        }
-  
-}
 }
