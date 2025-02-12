@@ -14,6 +14,7 @@ Purpose: Implements the BMPSensor class declarations.
 class BMPSensor{
 private:
     TwoWire* _wire;
+    byte _address; 
     float _temperature;
     float _pressure;
     float _altitude;
@@ -25,18 +26,18 @@ private:
     float _pressure_error;
     float _altitude_error;
 
-    const float SEALEVELPRESSURE_HPA = 1013.25;
+    const float SEALEVELPRESSURE_HPA =  1027.20; // in hecto pascal in kozani greece
 
 public:
     // Methods
-    BMPSensor(TwoWire* wire);
+    BMPSensor(byte addresss, TwoWire* wire);
     ~BMPSensor();
     void setup();
     void loop();
     void calculateBMPErrors();
 
     // Getters
-    float geTemperature();
+    float getTemperature();
     float getPressure();
     float getAltitute();
 };

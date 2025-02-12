@@ -83,13 +83,6 @@ void ICM20948Sensor::loop() {
     float gyro_z = _gz / 16.4; // ICM-20948 gyroscope sensitivity
     _angle_z += gyro_z * elapsed_time;
 
-    // Print values
-    Serial.print("AccX: "); Serial.println(_acc_x);
-    Serial.print("AccY: "); Serial.println(_acc_y);
-    Serial.print("AccZ: "); Serial.println(_acc_z);
-    Serial.print("AngleX: "); Serial.println(_angle_x);
-    Serial.print("AngleY: "); Serial.println(_angle_y);
-    Serial.print("AngleZ: "); Serial.println(_angle_z);
 }
 
 // Getters
@@ -128,9 +121,9 @@ void ICM20948Sensor::calculateIMUErrors() {
     _gyro_error_y /= sample_count;
     _gyro_error_z /= sample_count;
 
-    Serial.print("AccErrorX: "); Serial.println(_acc_error_x);
-    Serial.print("AccErrorY: "); Serial.println(_acc_error_y);
-    Serial.print("GyroErrorX: "); Serial.println(_gyro_error_x);
-    Serial.print("GyroErrorY: "); Serial.println(_gyro_error_y);
-    Serial.print("GyroErrorZ: "); Serial.println(_gyro_error_z);
+    Serial.print("{ICM20948} AccErrorX: "); Serial.println(_acc_error_x);
+    Serial.print("{ICM20948} AccErrorY: "); Serial.println(_acc_error_y);
+    Serial.print("{ICM20948} GyroErrorX: "); Serial.println(_gyro_error_x);
+    Serial.print("{ICM20948} GyroErrorY: "); Serial.println(_gyro_error_y);
+    Serial.print("{ICM20948} GyroErrorZ: "); Serial.println(_gyro_error_z);
 }

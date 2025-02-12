@@ -9,7 +9,7 @@ Purpose: Implements the BMPSensor class functions.
 #include <cmath>
 
 
-BMPSensor::BMPSensor(TwoWire* wire) : _wire(wire) {
+BMPSensor::BMPSensor(byte address,TwoWire* wire) : _wire(wire), _address(address) {
     _temp_error = 0.0;
     _pressure_error = 0.0;
     _altitude_error = 0.0;
@@ -29,10 +29,13 @@ void BMPSensor::setup(){
     // Initialize I2C communication
     _wire->begin();
 
-    if (!_bmp.begin_I2C(BMP3XX_DEFAULT_ADDRESS, _wire)) {   // hardware I2C mode, can pass in address & alt Wire
+    if (!_bmp.begin_I2C(_address, _wire)) {   // hardware I2C mode, can pass in address & alt Wire
         Serial.println("Could not find a valid BMP388 sensor, check wiring!");
         while (1);
     }
+
+    Serial.print("BMP388 connected successfully! with address: "); 
+    Serial.println(_address);
 
     // Set up oversampling and filter initialization
     _bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
@@ -50,25 +53,15 @@ void BMPSensor::loop(){
     }
 
     _temperature = _bmp.temperature; 
-    Serial.print("[BMP388]Temperature = ");
-    Serial.print(_temperature);
-    Serial.println(" *C");
-
     _pressure = _bmp.pressure;
-    Serial.print("[BMP388]Pressure = ");
-    Serial.print(_pressure);
-    Serial.println(" Pa");
-
     _altitude = _bmp.readAltitude(SEALEVELPRESSURE_HPA);
-    Serial.print("[BMP388]Approx. Altitude = ");
-    Serial.print(_altitude);
-    Serial.println(" m");
+
 }
 
 
 
 // Getters
-float BMPSensor::geTemperature(){
+float BMPSensor::getTemperature(){
     return _temperature;
 }
 
@@ -109,15 +102,7 @@ void BMPSensor::calculateBMPErrors(){
     altitude_ref = altitude_ref * samplecount;
     
     _temp_error =  sqrt(pow(_temp_error - temp_ref, 2)/samplecount);
-    // Serial.print("Temperature Error = ");
-    // Serial.print(_temp_error);
-    // Serial.println(" *C");
     _pressure_error = sqrt(pow(_pressure_error - pressure_ref, 2)/samplecount);
-    // Serial.print("Pressure Error = ");
-    // Serial.print(_pressure_error);
-    // Serial.println(" Pa");
     _altitude_error = sqrt(pow(_altitude_error - altitude_ref, 2)/samplecount);
-    // Serial.print("Altitude Error = ");
-    // Serial.print(_altitude_error);
-    // Serial.println(" m");
+    
 }
