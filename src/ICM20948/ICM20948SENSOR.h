@@ -10,8 +10,7 @@ Purpose: Extends the ICM20948Sensor class with quaternion calculations, absolute
 
 #include <Wire.h>
 #include "ICM20948.h"
-#include <MadgwickAHRS.h>
-
+#include <Adafruit_AHRS_Mahony.h>
 
 class ICM20948Sensor {
   private:
