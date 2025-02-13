@@ -1,129 +1,121 @@
-/*
+/*  
 File: ICM20948SENSOR.cpp
 Author: Theodoros Taloumtzis
 Date: 10/02/2025
-Purpose: Implements the ICM20948Sensor class functions.
+Purpose: Implements the ICM20948Sensor class with quaternion calculations, absolute yaw, and calibration.
 */
 
 #include "ICM20948SENSOR.h"
 
-// Constructor accepts an I2C instance
-ICM20948Sensor::ICM20948Sensor(TwoWire* wire) : _wire(wire) {
-    _ax = 0;
-    _ay = 0;
-    _az = 0;
-    _gx = 0;
-    _gy = 0;
-    _gz = 0;
+Madgwick filter;
 
-    _acc_x = 0;
-    _acc_y = 0;
-    _acc_z = 0;
-
-    _angle_x = 0;
-    _angle_y = 0;
-    _angle_z = 0;
-
-    _acc_error_x = 0;
-    _acc_error_y = 0;
-
-    _gyro_error_x = 0;
-    _gyro_error_y = 0;
-    _gyro_error_z = 0;
-
-    _previous_time = 0;
+ICM20948Sensor::ICM20948Sensor(TwoWire* wire) : _wire(wire), _icm(*wire, 0x69) {
+    _ax = _ay = _az = 0.0;
+    _gx = _gy = _gz = 0.0;
+    _mx = _my = _mz = 0.0;
+    _acc_x = _acc_y = _acc_z = 0.0;
+    _angle_x = _angle_y = _angle_z = 0.0;
+    _velocity_x = _velocity_y = _velocity_z = 0.0;
+    _previous_time = micros();
+    _q0 = 1.0; _q1 = _q2 = _q3 = 0.0;
 }
 
-// Destructor
-ICM20948Sensor::~ICM20948Sensor() { }
-
+ICM20948Sensor::~ICM20948Sensor() {}
 
 void ICM20948Sensor::setup() {
-    // Initialize serial communication
-    Serial.begin(9600);
-
+    Serial.begin(115200);
     _wire->begin();
     
-    // Initialize the ICM-20948
-    if (_icm.begin(*_wire, 0x69) != ICM_20948_Stat_Ok) {
+    if (_icm.begin() < 0) {
         Serial.println("ICM-20948 connection failed");
         while (1);
     }
-
     Serial.println("ICM-20948 connected successfully!");
-
-    calculateIMUErrors();
+    
+    _icm.configMag(); // Enable magnetometer
+    calibrateIMU();
+    filter.begin(100); // Initialize Madgwick filter with 100Hz update rate
 }
 
 void ICM20948Sensor::loop() {
-    _icm.getAGMT(); // Read Accelerometer, Gyroscope, Magnetometer, and Temperature
-    
-    _ax = _icm.accX();
-    _ay = _icm.accY();
-    _az = _icm.accZ();
-    
-    _gx = _icm.gyrX();
-    _gy = _icm.gyrY();
-    _gz = _icm.gyrZ();
+    if (_icm.readSensor() == 1) { 
+        _ax = _icm.getAccelX_mss() - _acc_bias_x;
+        _ay = _icm.getAccelY_mss() - _acc_bias_y;
+        _az = _icm.getAccelZ_mss() - _acc_bias_z;
+        _gx = _icm.getGyroX_rads() - _gyro_bias_x;
+        _gy = _icm.getGyroY_rads() - _gyro_bias_y;
+        _gz = _icm.getGyroZ_rads() - _gyro_bias_z;
+        _mx = _icm.getMagX_uT();
+        _my = _icm.getMagY_uT();
+        _mz = _icm.getMagZ_uT();
 
-    // Convert raw accelerometer readings to g-force values (ICM-20948 uses different scale)
-    _acc_x = _ax * 9.81 / 32768.0;
-    _acc_y = _ay * 9.81 / 32768.0;
-    _acc_z = _az * 9.81 / 32768.0;
+        unsigned long current_time = micros();
+        float elapsed_time = (current_time - _previous_time) / 1.0e6;
+        _previous_time = current_time;
 
-    // Calculate roll and pitch angles
-    _angle_x = atan2(_acc_y, _acc_z) * 180 / PI;
-    _angle_y = atan2(-_acc_x, sqrt(_acc_y * _acc_y + _acc_z * _acc_z)) * 180 / PI;
+        // Update velocity
+        updateVelocity();
 
-    // Calculate yaw using gyroscope
-    unsigned long current_time = millis();
-    float elapsed_time = (current_time - _previous_time) / 1000.0;
-    _previous_time = current_time;
-
-    float gyro_z = _gz / 16.4; // ICM-20948 gyroscope sensitivity
-    _angle_z += gyro_z * elapsed_time;
-
+        // Update quaternion using Madgwick filter (Now includes magnetometer)
+        filter.update(_gx, _gy, _gz, _ax, _ay, _az, _mx, _my, _mz);
+        _q0 = filter.q0;
+        _q1 = filter.q1;
+        _q2 = filter.q2;
+        _q3 = filter.q3;
+    }
 }
 
-// Getters
-float ICM20948Sensor::getAccX() { return _acc_x; }
-float ICM20948Sensor::getAccY() { return _acc_y; }
-float ICM20948Sensor::getAccZ() { return _acc_z; }
-float ICM20948Sensor::getAngleX() { return _angle_x; }
-float ICM20948Sensor::getAngleY() { return _angle_y; }
-float ICM20948Sensor::getAngleZ() { return _angle_z; }
+void ICM20948Sensor::updateVelocity() {
+    float dt = (_previous_time - micros()) / 1.0e6;
+    _velocity_x += _ax * dt;
+    _velocity_y += _ay * dt;
+    _velocity_z += _az * dt;
+}
 
-void ICM20948Sensor::calculateIMUErrors() {
-    int sample_count = 256;
+void ICM20948Sensor::resetVelocity() {
+    _velocity_x = _velocity_y = _velocity_z = 0.0;
+}
+
+void ICM20948Sensor::calibrateIMU() {
+    Serial.println("Calibrating IMU, please keep it still...");
+    int sample_count = 500;
+    _acc_bias_x = _acc_bias_y = _acc_bias_z = 0.0;
+    _gyro_bias_x = _gyro_bias_y = _gyro_bias_z = 0.0;
     
     for (int i = 0; i < sample_count; i++) {
-        _icm.getAGMT();
-        
-        _ax = _icm.accX();
-        _ay = _icm.accY();
-        _az = _icm.accZ();
-        
-        _gx = _icm.gyrX();
-        _gy = _icm.gyrY();
-        _gz = _icm.gyrZ();
-
-        _acc_error_x += atan2(_ay, sqrt(_ax * _ax + _az * _az)) * 180 / PI;
-        _acc_error_y += atan2(-_ax, sqrt(_ay * _ay + _az * _az)) * 180 / PI;
-
-        _gyro_error_x += _gx / 16.4;
-        _gyro_error_y += _gy / 16.4;
-        _gyro_error_z += _gz / 16.4;
+        if (_icm.readSensor() == 1) {
+            _acc_bias_x += _icm.getAccelX_mss();
+            _acc_bias_y += _icm.getAccelY_mss();
+            _acc_bias_z += _icm.getAccelZ_mss();
+            _gyro_bias_x += _icm.getGyroX_rads();
+            _gyro_bias_y += _icm.getGyroY_rads();
+            _gyro_bias_z += _icm.getGyroZ_rads();
+        }
+        delay(10);
     }
-
-    _acc_error_x /= sample_count;
-    _acc_error_y /= sample_count;
-    _gyro_error_x /= sample_count;
-    _gyro_error_y /= sample_count;
-    _gyro_error_z /= sample_count;
-
-    Serial.print("{ICM20948} AccErrorX: "); Serial.println(_acc_error_x);
-    Serial.print("{ICM20948} AccErrorY: "); Serial.println(_acc_error_y);
-    Serial.print("{ICM20948} GyroErrorX: "); Serial.println(_gyro_error_x);
-    Serial.print("{ICM20948} GyroErrorY: "); Serial.println(_gyro_error_y);
-    Serial.print("{ICM20948} GyroErrorZ: "); Serial.println(_gyro_error_z);
+    _acc_bias_x /= sample_count;
+    _acc_bias_y /= sample_count;
+    _acc_bias_z /= sample_count;
+    _gyro_bias_x /= sample_count;
+    _gyro_bias_y /= sample_count;
+    _gyro_bias_z /= sample_count;
+    Serial.println("Calibration complete.");
 }
+
+void ICM20948Sensor::getEulerAngles(float &roll, float &pitch, float &yaw) {
+    roll = atan2(2.0f * (_q0 * _q1 + _q2 * _q3), 1.0f - 2.0f * (_q1 * _q1 + _q2 * _q2)) * 180.0 / PI;
+    pitch = asin(2.0f * (_q0 * _q2 - _q3 * _q1)) * 180.0 / PI;
+    yaw = atan2(2.0f * (_q0 * _q3 + _q1 * _q2), 1.0f - 2.0f * (_q2 * _q2 + _q3 * _q3)) * 180.0 / PI;
+
+    // Ensure yaw remains in the range [0, 360]
+    if (yaw < 0) yaw += 360.0;
+}
+
+float ICM20948Sensor::getQuaternionQ0() { return _q0; }
+float ICM20948Sensor::getQuaternionQ1() { return _q1; }
+float ICM20948Sensor::getQuaternionQ2() { return _q2; }
+float ICM20948Sensor::getQuaternionQ3() { return _q3; }
+
+float ICM20948Sensor::getVelocityX() { return _velocity_x; }
+float ICM20948Sensor::getVelocityY() { return _velocity_y; }
+float ICM20948Sensor::getVelocityZ() { return _velocity_z; }
