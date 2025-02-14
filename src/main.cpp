@@ -10,7 +10,7 @@
 #include"Servo\PWMServo.h"
 
 #define DHT22_PIN 5
-#define SERVO_PIN 18
+#define SERVO_PIN 4 // TVCX in the PCB schematics
 #define INTERVAL 1000
 
 
@@ -40,8 +40,8 @@ void loop() {
 
   	if(millis() - _interval > INTERVAL ){
 
-	  	_sensors.loop();
-		//_airbrakes.loop();
+	  	//_sensors.loop();
+		_airbrakes.loop();
       	_interval = millis();
   	}
 

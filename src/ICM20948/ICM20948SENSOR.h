@@ -12,16 +12,20 @@ Purpose: Extends the ICM20948Sensor class with quaternion calculations, absolute
 #include "ICM20948.h"
 #include <Adafruit_AHRS_Mahony.h>
 
+
+
 class ICM20948Sensor {
   private:
     ICM20948 _icm;  // ICM-20948 sensor instance
     TwoWire* _wire;  // Reference to the I2C bus instance
+    Adafruit_Mahony _filter;
 
     float _ax, _ay, _az, _gx, _gy, _gz, _mx, _my, _mz;
     float _acc_x, _acc_y, _acc_z;
     float _angle_x, _angle_y, _angle_z;
     float _velocity_x, _velocity_y, _velocity_z;
     unsigned long _previous_time;
+
 
     // Error correction values
     float _acc_bias_x, _acc_bias_y, _acc_bias_z;
@@ -38,19 +42,19 @@ class ICM20948Sensor {
     void loop();   // Runs in the loop function and updates sensor data
     void calibrateIMU();  // Method to calculate sensor errors
 
-    // Velocity tracking
-    void updateVelocity();
-    void resetVelocity();
+    // // Velocity tracking
+    // void updateVelocity();
+    // void resetVelocity();
 
-    // Getters for angles
-    float getAngleX();
-    float getAngleY();
-    float getAngleZ();
+    // // Getters for angles
+    // float getAngleX();
+    // float getAngleY();
+    // float getAngleZ();
 
-    // Getters for velocity
-    float getVelocityX();
-    float getVelocityY();
-    float getVelocityZ();
+    // // Getters for velocity
+    // float getVelocityX();
+    // float getVelocityY();
+    // float getVelocityZ();
 
     // Getters for quaternion values
     float getQuaternionQ0();

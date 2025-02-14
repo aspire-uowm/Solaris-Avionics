@@ -33,10 +33,15 @@ void Sensors::update_avg_sensor_data() {
     _avg_pressure = (_bmp1->getPressure() + _bmp2->getPressure()) / 2.0;
     _avg_humidity = _dht->getHumidity();
 
+    _icm1->getEulerAngles(_avg_roll, _avg_pitch, _avg_yaw);
+
     Serial.print("Average Altitude: "); Serial.print(_avg_altitude); Serial.println(" m");
     Serial.print("Average Temperature: "); Serial.print(_avg_temperature); Serial.println(" C");
     Serial.print("Average Pressure: "); Serial.print(_avg_pressure); Serial.println(" Pa");
     Serial.print("Average Humidity: "); Serial.print(_avg_humidity); Serial.println(" %");
+    Serial.print("Average Roll: "); Serial.print(_avg_roll); Serial.println(" degrees");
+    Serial.print("Average Pitch: "); Serial.print(_avg_pitch); Serial.println(" degrees");
+    Serial.print("Average Yaw: "); Serial.print(_avg_yaw); Serial.println(" degrees");
     Serial.println("===============================================");
 
 }

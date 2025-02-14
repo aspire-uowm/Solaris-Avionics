@@ -2,14 +2,14 @@
 #define AIRBRAKES_H
 
 #include <Arduino.h>
-//#include "Servo\PWMServo.h" 
-#include <ESP32Servo.h>
+#include "Servo\PWMServo.h" 
+
 
 class Airbrakes {
   private:
     int pin;  // Pin that controls the airbrakes (e.g., PWM or digital output)
-    //PWMServo myServo;
-    Servo myServo;
+    PWMServo myServo;
+    //Servo myServo;
   public:
     // Constructor to initialize the airbrakes with the pin number
     Airbrakes(int controlPin);

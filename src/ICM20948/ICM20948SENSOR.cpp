@@ -7,7 +7,7 @@ Purpose: Implements the ICM20948Sensor class with quaternion calculations, absol
 
 #include "ICM20948SENSOR.h"
 
-Adafruit_Mahony filter;
+
 
 ICM20948Sensor::ICM20948Sensor(TwoWire* wire) : _wire(wire), _icm(*wire, 0x69) {
     _ax = _ay = _az = 0.0;
@@ -31,7 +31,7 @@ void ICM20948Sensor::setup() {
     
     _icm.configMag(); // Enable magnetometer
     calibrateIMU();
-    filter.begin(100); // Initialize Adafruit Mahony filter with 100Hz update rate
+    _filter.begin(100); // Initialize Adafruit Mahony filter with 100Hz update rate
 }
 
 void ICM20948Sensor::loop() {
@@ -54,11 +54,9 @@ void ICM20948Sensor::loop() {
             _mz = _icm.getMagZ_uT();
 
             // Update quaternion using Adafruit Mahony filter
-            filter.update(_gx, _gy, _gz, _ax, _ay, _az, _mx, _my, _mz);
-            _q0 = filter.getRollRadians();
-            _q1 = filter.getPitchRadians();
-            _q2 = filter.getYawRadians();
-        }
+            _filter.update(_gx, _gy, _gz, _ax, _ay, _az, _mx, _my, _mz);
+            _filter.getQuaternion(&_q0, &_q1, &_q2, &_q3);
+        }   
     }
 }
 
@@ -94,9 +92,9 @@ void ICM20948Sensor::calibrateIMU() {
 }
 
 void ICM20948Sensor::getEulerAngles(float &roll, float &pitch, float &yaw) {
-    roll = filter.getRoll();
-    pitch = filter.getPitch();
-    yaw = filter.getYaw();
+    roll = _filter.getRoll();
+    pitch = _filter.getPitch();
+    yaw = _filter.getYaw();
 }
 
 float ICM20948Sensor::getQuaternionQ0() { return _q0; }

@@ -27,6 +27,10 @@ private:
     float _avg_pressure;
     float _avg_humidity;
 
+    float _avg_roll;
+    float _avg_pitch;
+    float _avg_yaw;
+
     // float _avg_acc_x;
     // float _avg_acc_y;
     // float _avg_acc_z;

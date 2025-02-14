@@ -43,11 +43,7 @@ void Airbrakes::loop() {
 
 void Airbrakes::setup(){
     // Allow allocation of all timers
-	ESP32PWM::allocateTimer(0);
-	ESP32PWM::allocateTimer(1);
-	ESP32PWM::allocateTimer(2);
-	ESP32PWM::allocateTimer(3);
-	myServo.setPeriodHertz(50);    // standard 50 hz servo
+   // standard 50 hz servo
 	myServo.attach(pin);
     Serial.println("Airbrakes setup complete.");
 }
