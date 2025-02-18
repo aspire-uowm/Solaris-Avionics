@@ -3,16 +3,26 @@
 
 #include <Arduino.h>
 #include "Servo\PWMServo.h" 
+#include "Sensors.h"
+#include <math.h>  // For math operations
 
 
 class Airbrakes {
   private:
     int pin;  // Pin that controls the airbrakes (e.g., PWM or digital output)
-    PWMServo myServo;
+    PWMServo _myServo;
+    Sensors *_sensors;
     //Servo myServo;
+    float Aref ;
+    float m ; 
+    float c1;
+    float c2;
+    float T;
+    float k;
+    float H;
   public:
     // Constructor to initialize the airbrakes with the pin number
-    Airbrakes(int controlPin);
+    Airbrakes(int controlPin, Sensors* sensorsData);
 
     // Method to activate the airbrakes
     void deploy();
@@ -22,6 +32,10 @@ class Airbrakes {
 
     // Method to adjust the position of the airbrakes (e.g., open/close)
     void adjust(int angle);
+
+    void control_based_on_sensors();
+    
+    float calculate_apogee();
 
     void loop();
 

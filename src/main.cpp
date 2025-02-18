@@ -24,7 +24,7 @@ Sensors _sensors(&_icm1, &_bmp1, &_bmp2, &_dht);
 
 uint32_t _interval = 0;
 
-Airbrakes _airbrakes(SERVO_PIN);  // Servo connected to pin 17
+Airbrakes _airbrakes(SERVO_PIN, &_sensors);  // Servo connected to pin 17
 
 void setup() {
 

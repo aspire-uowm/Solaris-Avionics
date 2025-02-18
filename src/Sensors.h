@@ -31,17 +31,6 @@ private:
     float _avg_pitch;
     float _avg_yaw;
 
-    // float _avg_acc_x;
-    // float _avg_acc_y;
-    // float _avg_acc_z;
-
-    // float _avg_velocity_x;
-    // float _avg_velocity_y;
-    // float _avg_velocity_z;
-
-    // float _avg_angle_x;
-    // float _avg_angle_y;
-    // float _avg_angle_z;
 
 public:
 
@@ -63,6 +52,16 @@ float get_avg_altitude();
 float get_avg_temperature();
 float get_avg_pressure();
 float get_avg_humidity();
+
+float get_u_pitot(){ // pitot tube velocity
+    return 0; // to be implemented
+}
+
+float get_avg_roll();
+
+float get_avg_pitch();
+
+float get_avg_yaw();
 
 // float get_avg_acc_x();
 // float get_avg_acc_y();

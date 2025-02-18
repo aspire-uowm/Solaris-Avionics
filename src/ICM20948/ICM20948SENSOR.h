@@ -10,23 +10,20 @@ Purpose: Extends the ICM20948Sensor class with quaternion calculations, absolute
 
 #include <Wire.h>
 #include "ICM20948.h"
-#include <Adafruit_AHRS_Mahony.h>
-
-
+#include <Adafruit_AHRS_Madgwick.h>
 
 class ICM20948Sensor {
   private:
+  	TwoWire* _wire;  // Reference to the I2C bus instance
     ICM20948 _icm;  // ICM-20948 sensor instance
-    TwoWire* _wire;  // Reference to the I2C bus instance
-    Adafruit_Mahony _filter;
+    
+    Adafruit_Madgwick _filter;
 
     float _ax, _ay, _az, _gx, _gy, _gz, _mx, _my, _mz;
-    float _acc_x, _acc_y, _acc_z;
-    float _angle_x, _angle_y, _angle_z;
-    float _velocity_x, _velocity_y, _velocity_z;
-    unsigned long _previous_time;
+   
+    float _pitch, _roll, _yaw;
 
-
+	unsigned long _previous_time;
     // Error correction values
     float _acc_bias_x, _acc_bias_y, _acc_bias_z;
     float _gyro_bias_x, _gyro_bias_y, _gyro_bias_z;
@@ -56,12 +53,9 @@ class ICM20948Sensor {
     // float getVelocityY();
     // float getVelocityZ();
 
-    // Getters for quaternion values
-    float getQuaternionQ0();
-    float getQuaternionQ1();
-    float getQuaternionQ2();
-    float getQuaternionQ3();
-
+	float getRoll();
+	float getPitch();
+	float getYaw();
     // Compute Euler angles from quaternion
     void getEulerAngles(float &roll, float &pitch, float &yaw);
 };
