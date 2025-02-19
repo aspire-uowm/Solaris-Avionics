@@ -1,4 +1,3 @@
-# EspTest
-Simple sensor test for aspire avionics division
+# Solaris Avionics
 
-Project Solaris is a sounding rocket set to compete in EuRoC 2025, designed to carry out a biomedical experiment during its flight. Below is the complete avionics system developed for Solaris, supporting both mission-critical functions and experimental data acquisition.
+Solaris Avionics is the embedded software running on a Teensy 4.1 microcontroller, responsible for managing data acquisition and control systems for the Solaris Rocketry Project. The avionics system is designed to handle real-time sensor data processing and actuation to ensure precise flight control.
