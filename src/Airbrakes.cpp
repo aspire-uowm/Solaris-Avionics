@@ -4,11 +4,12 @@
 #define MAX_BRAKE_ANGLE 180               // Maximum deployment angle
 #define MIN_BRAKE_ANGLE 0                 // Minimum deployment angle
 #define ALTITUDE_DEPLOY_THRESHOLD 100.0  // Adjust as needed
+#define ALTITUDE_OF_GOAL 3000.0
 #define G 9.81                             // Gravitational acceleration (m/s^2)
 #define cd 1.1649385
 #define p  1.225 
-#define m 70  //Temporary
-#define Aref 2268 //Temporary
+#define _m 70  //Temporary
+#define _Aref 2268 //Temporary
 
 
 // PID variables
@@ -51,24 +52,24 @@ void Airbrakes::adjust(int angle) {
 
 float Airbrakes::calculate_apogee(){
   float h = _sensors->get_avg_altitude();  // Current altitude
-  float u_pitot = _sensors->get_u_pitot();     // Free-stream velocity
+  float u_pitot = _sensors->get_velocity();     // Free-stream velocity
   float theta = _sensors->get_avg_pitch(); // Pitch angle
 
   //Drag coefficient constant
-  k = (p * cd * Aref)/(2 * std::sin(theta));
+  _k = (p * cd * _Aref)/(2 * std::sin(theta));
   // Constants
-  c1 = sqrt((m * G) / k);     // c1 value
-  c2 = sqrt(m / (k * G));     // c2 value
+  _c1 = sqrt((_m * G) / _k);     // c1 value
+  _c2 = sqrt(_m / (_k * G));     // c2 value
 
   // Time to reach apogee
-  T = (c2 * (atan(u_pitot * sin(theta)) / c1));
+  _T = (_c2 * (atan(u_pitot * sin(theta)) / _c1));
   
   // Apogee height calculation
-  H = (c1 * c2 * log(1 / cos(T / c2))) + h;
+  _H = (_c1 * _c2 * log(1 / cos(_T / _c2))) + h;
 
   Serial.print("Calculated Apogee: ");
-  Serial.println(H);
-  return H;
+  Serial.println(_H);
+  return _H;
 }
 
 void Airbrakes::control_based_on_sensors(){

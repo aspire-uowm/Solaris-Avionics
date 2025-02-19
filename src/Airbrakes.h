@@ -13,13 +13,13 @@ class Airbrakes {
     PWMServo _myServo;
     Sensors *_sensors;
     //Servo myServo;
-    float Aref ;
-    float m ; 
-    float c1;
-    float c2;
-    float T;
-    float k;
-    float H;
+    float _Aref ;
+    float _m ; 
+    float _c1;
+    float _c2;
+    float _T;
+    float _k;
+    float _H;
   public:
     // Constructor to initialize the airbrakes with the pin number
     Airbrakes(int controlPin, Sensors* sensorsData);

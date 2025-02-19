@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 //#include "GPS\GPSsens.h"
-#include "PITOT\MPXV7002DP.h"
+#include "PITOT\PRESSURE_SENSOR.h"
 #include "ICM20948\ICM20948SENSOR.h"
 #include "BMP\BMPSensor.h"
 #include "Sensors.h"
@@ -11,6 +11,10 @@
 
 #define DHT22_PIN 5
 #define SERVO_PIN 4 // TVCX in the PCB schematics
+#define PITOT_PIN 25
+#define REF_PIN 26
+
+#define AIR_DENSITY 1.293
 #define INTERVAL 1000
 
 
@@ -18,8 +22,9 @@ ICM20948Sensor _icm1(&Wire);
 BMPSensor _bmp1(0x77, &Wire);
 BMPSensor _bmp2(0x76, &Wire);
 DHTSensor _dht(DHT22_PIN);
+PressureSensor _pitot(PITOT_PIN, REF_PIN, AIR_DENSITY); 
 
-Sensors _sensors(&_icm1, &_bmp1, &_bmp2, &_dht);
+Sensors _sensors(&_icm1, &_bmp1, &_bmp2, &_dht, &_pitot);
 
 
 uint32_t _interval = 0;
@@ -40,8 +45,8 @@ void loop() {
 
   	if(millis() - _interval > INTERVAL ){
 
-	  	//_sensors.loop();
-		_airbrakes.loop();
+	  	_sensors.loop();
+		//_airbrakes.loop();
       	_interval = millis();
   	}
 
