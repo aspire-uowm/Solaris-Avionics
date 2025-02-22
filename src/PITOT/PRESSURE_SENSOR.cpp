@@ -2,8 +2,8 @@
 
 
 // Constructor
-PressureSensor::PressureSensor(int analogPin, int analogRefPin , float density) : 
-                _analogPin(analogPin), _analogRefPin(analogRefPin), _density(density) {} 
+PressureSensor::PressureSensor(int analogPin, int analogRefPin , float density) :
+                _analogPin(analogPin), _analogRefPin(analogRefPin), _density(density) {}
 
 // Destructor
 PressureSensor::~PressureSensor() {
@@ -46,18 +46,15 @@ void PressureSensor::updatePressure() {
 
 
 void PressureSensor::speedUpdate(){
-    int flag = 1;
-    if (_diffPressure < 0) {
-        _diffPressure = abs(_diffPressure);
-        flag = -1;
-    }
-    
+    _diffPressure = abs(_diffPressure);
+    int flag = (_diffPressure < 0) ? -1 : 1;
+
     _airSpeed = sqrt(2 * _diffPressure/_density); //density calculation
 
     _airSpeed = _airSpeed * flag;
-    
+
 }
 
 float PressureSensor::getSpeed(){
     return _airSpeed;
-}   
+}
