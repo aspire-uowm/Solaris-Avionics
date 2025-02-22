@@ -40,7 +40,7 @@ void PressureSensor::updatePressure() {
     Serial.print("Vout: "); Serial.println(_Vout);
     _diffPressure = (_Vout - 0.1 * _Vref) *(P_MAX - P_MIN) / (0.8 * _Vref) + P_MIN;
     Serial.print("Diff Pressure: "); Serial.println(_diffPressure);
-    _diffPressure = _diffPressure / 10; // convert to kPa form mbar
+    _diffPressure = _diffPressure * 100; // convert mbar to Pa
 }
 
 
