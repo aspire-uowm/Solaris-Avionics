@@ -46,8 +46,8 @@ void PressureSensor::updatePressure() {
 
 
 void PressureSensor::speedUpdate(){
-    _diffPressure = abs(_diffPressure);
     int flag = (_diffPressure < 0) ? -1 : 1;
+    _diffPressure = abs(_diffPressure);
 
     _airSpeed = sqrt(2 * _diffPressure/_density); //density calculation
 
