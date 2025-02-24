@@ -7,6 +7,11 @@
 #define P_MAX 600
 #define ADC_RESOLUTION 4095
 
+#define NUM_SMAPLES 10 
+#define ALPHA 0.1
+
+
+
 
 class PressureSensor {
 public:
@@ -20,9 +25,10 @@ public:
 
     void loop();
 
-    
-    void updatePressure();
+    float applyKalmanFilter(float mesurement);
 
+    void calibrateBias();
+    void updatePressure();
     void speedUpdate();
 
     float getSpeed();
@@ -35,6 +41,14 @@ private:
     float _Vref;
     float _density;
     float _airSpeed;
+    float _bias;
+
+
+    // Kalman filter variables
+    float _kalmanX; // Estimated state (pressure)
+    float _kalmanP; // Error covariance
+    float _kalmanQ; // Process noise covariance
+    float _kalmanR; // Measurement noise covariance
 };
 
 #endif // PRESSURE_SENSOR_H
